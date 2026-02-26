@@ -12,13 +12,12 @@ public class UserServices {
     @Autowired
     UserRepo ref; // ref will be used to perform database related operations
 
-    public boolean isValid(String email,String password)
+    private boolean epValidation(String email,String password) // Email and password validation
      {
-       //String msg = "";
-       boolean result = true; // Empty string
+       boolean result = true; // let's assume email and password is valid 
 
-        // Email regex
-       String emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.com$";
+       // Email regex
+       String emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
    
        // Password regex:
        // 8–12 chars, 1 digit, 1 uppercase, 1 special
@@ -35,43 +34,56 @@ public class UserServices {
             // msg = "Password must be 8-12 chars, 1 uppercase, 1 digit, 1 special";
             result = false;
         }
-       else // If everything is correct - valid email and password
-        {
-           User temp = ref.findByEmail(email);
-
-           if(temp!=null && temp.getPassword().equals(password)) // Registered email and password match
-            {
-              // msg = "Login successful";
-              result = true;
-            }
-           else if(temp!=null && !temp.getPassword().equals(password)) // Registered email but wrong password
+       System.out.println("epValidateion() returns "+result);
+       return (result);
+     }
+    public boolean login(String email,String password)
+     {
+       //String msg = "";
+       boolean result = false; // let's assume email address don't match or password is wrong 
+       if(epValidation(email, password)!=false) // Valid email and password
+       {
+         System.out.println("Valid email and password");
+         User temp = ref.findByEmail(email);
+  
+         if(temp!=null && temp.getPassword().equals(password)) // Registered email and password match
+          {
+            // msg = "Login successful";
+            result = true;
+          }
+         else if(temp!=null && !temp.getPassword().equals(password)) // Registered email but wrong password
+          {
             //msg = "wrong password";
             result = false;
-           else 
-            //msg = "Email Address is not registered";
-            result = false;
-        } 
-        return result;
+          }
+         else 
+         {
+           //msg = "Email Address is not registered";
+           result = false;
+         }
+       }
+      System.out.println(result);
+      return result;
      }
     public boolean createAccount(User user)
      {
-       boolean result;
+       System.out.println(user.toString());
+       boolean result = false;
        // String msg = "";
-       if (ref.findByEmail(user.getEmail())==null) // If username already used
-        {
-           //msg = "Username already exists";
-           result = false;
-
-        }   
-       else // Check for email and password validation 
-        {
-          result = isValid(user.getEmail(),user.getPassword());
-          if(result) // email and password is valid
+       if(epValidation(user.getEmail(), user.getPassword())!=false) // Valid email and password
+       {
+          if (ref.findByEmail(user.getEmail())!=null) // If username already used
            {
+              //msg = "Username already exists";
+              result = false;
+           } 
+          else // If username doesn't exists already - then add it
+           { 
              ref.save(user);
-             //msg = "Account created successfully";
+             //msg = "Account created successfully"
+             result = true;
            }
         }
-      return (result);
-     }
+       return (result);
+     } // method ends here
 }

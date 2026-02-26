@@ -103,5 +103,17 @@ public class User {
         this.locality = locality;
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId=" + userId +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", phone='" + phone + '\'' +
+                ", address='" + address + '\'' +
+                ", locality='" + locality + '\'' +
+                '}';
+    }
 
 }

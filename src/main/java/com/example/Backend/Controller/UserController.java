@@ -8,7 +8,9 @@ import com.example.Backend.Services.UserServices;
 import com.example.Backend.Repositories.UserRepo; // to use 'UserRepo' repository
 import com.example.Backend.Entities.User; // to use class 'User'
 
+@CrossOrigin(origins = "*")
 @Controller
+@RequestMapping("/api")
 public class UserController {
 
     @Autowired
@@ -20,20 +22,18 @@ public class UserController {
     @RequestMapping
     public String accountCreation()
      {
-       
        return "getUser";
      }
 
-    @RequestMapping("login")
+    @RequestMapping("/login")
     @ResponseBody
-    public boolean login(String email,String password)
+    public boolean login( String email,String password)
      {
-       return(us.isValid(email, password));
+       return(us.login(email, password));
      }
-    
-    @RequestMapping("createAccount")
+    @RequestMapping("/createAccount")
     @ResponseBody // Used to return the string not the view 
-    public boolean createAccount(/*String email,String password*/User user)
+    public boolean createAccount(/*String email,String password*/@RequestBody User user)
      {
         return (us.createAccount(user));
      }
