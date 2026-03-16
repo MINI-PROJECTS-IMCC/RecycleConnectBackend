@@ -5,6 +5,8 @@ import com.example.Backend.Repositories.UserRepo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.example.Backend.DTO.ApiResponse; // to use class 'ApiResponse'
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; // to use class 'BCryptPasswordEncoder'
 
 @Service 
 public class UserServices {
@@ -12,9 +14,21 @@ public class UserServices {
     @Autowired
     UserRepo ref; // ref will be used to perform database related operations
 
-    private boolean epValidation(String email,String password) // Email and password validation
+    BCryptPasswordEncoder encoder; // will be used to encode the password 
+
+    ApiResponse response;
+
+    // 0 arg constructor
+    public UserServices()
      {
-       boolean result = true; // let's assume email and password is valid 
+       response = new ApiResponse();
+       encoder = new BCryptPasswordEncoder(); // default strength is 10 hence , I am not passing any argument , if you want any other strenght then you can pass it as an argument
+     }
+
+    private String epValidation(String email,String password) // Email and password validation
+     {
+       // boolean result = true; // let's assume email and password is valid 
+       String msg = "valid email and password"; // Created an empty string
 
        // Email regex
        String emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
@@ -23,67 +37,75 @@ public class UserServices {
        // 8–12 chars, 1 digit, 1 uppercase, 1 special
        String passPattern = "^(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,12}$";
 
-       // Validation and verification(else block -> verification) 
-        if (email == null || !email.matches(emailPattern)) // empty email or email is not empty but invalid 
+       // Validation
+        if(email.length()==0 && password.length()==0) // Empty email and password is sent
+          msg = "Email and password can't be empty";
+        else if (email == null || !email.matches(emailPattern)) // empty email or email is not empty but invalid 
         {
-           // msg = "Invalid email format";
-           result = false;
+           msg = "Invalid email format";
+           //result = false;
         }
        else if (password == null || !password.matches(passPattern)) // empty password or password is not empty but invalid
         {
-            // msg = "Password must be 8-12 chars, 1 uppercase, 1 digit, 1 special";
-            result = false;
+            msg = "Password must be 8-12 chars, 1 uppercase, 1 digit, 1 special symbol";
+            //result = false;
         }
-       System.out.println("epValidateion() returns "+result);
-       return (result);
+       System.out.println("epValidation() returns "+msg);
+       return (msg);
      }
-    public boolean login(String email,String password)
+    public ApiResponse login(String email,String password)
      {
-       //String msg = "";
-       boolean result = false; // let's assume email address don't match or password is wrong 
-       if(epValidation(email, password)!=false) // Valid email and password
+       String msg = epValidation(email, password);
+       // boolean result = false; // let's assume email address don't match or password is wrong 
+       if(epValidation(email, password)=="valid email and password") // Valid email and password
        {
          System.out.println("Valid email and password");
-         User temp = ref.findByEmail(email);
+         User temp = ref.findByEmail(email); // will point to the database user matching with received email id from the frontend
   
-         if(temp!=null && temp.getPassword().equals(password)) // Registered email and password match
+         if(temp!=null && encoder.matches(password,temp.getPassword())) // Registered email and password match
           {
-            // msg = "Login successful";
-            result = true;
+            msg = "Login successfull";
+            //result = true;
           }
-         else if(temp!=null && !temp.getPassword().equals(password)) // Registered email but wrong password
+         else if(temp!=null && !encoder.matches(password,temp.getPassword())) // Registered email but wrong password
           {
-            //msg = "wrong password";
-            result = false;
+            msg = "wrong password";
+            //result = false;
           }
          else 
          {
-           //msg = "Email Address is not registered";
-           result = false;
+           msg = "Email Address is not registered";
+           //result = false;
          }
        }
-      System.out.println(result);
-      return result;
+      System.out.println(msg);
+      response.setMessage(msg);
+      return response;
+      // return msg;
      }
-    public boolean createAccount(User user)
+    public ApiResponse createAccount(User user)
      {
        System.out.println(user.toString());
-       boolean result = false;
-       // String msg = "";
-       if(epValidation(user.getEmail(), user.getPassword())!=false) // Valid email and password
+       // boolean result = false;
+       String msg = epValidation(user.getEmail(), user.getPassword());
+       if(msg=="valid email and password") // Valid email and password
        {
           if (ref.findByEmail(user.getEmail())!=null) // If username already used
            {
-              //msg = "Username already exists";
-              result = false;
+              msg = "Username already exists";
+              //result = false;
            } 
-          else // If username doesn't exists already - then add it
+          else // If username doesn't exists already - then save this user into database
            { 
+             System.out.println(user.toString());
+             user.setPassword(encoder.encode(user.getPassword())); // encode the password and updtaed it in user object
              ref.save(user);
-             //msg = "Account created successfully"
-             result = true;
+             msg = "Account created successfully";
+             //result = true;
            }
         }
-       return (result);
+       response.setMessage(msg);
+       return response;
+       // return (msg); - use if returning string
      } // method ends here
 }

@@ -1,6 +1,6 @@
 package com.example.Backend.Entities;
 
-import jakarta.persistence.*;
+import jakarta.persistence.*; // to use annotations like @Id,@Column,e.t.c
 
 @Entity
 @Table(name = "user")
@@ -24,9 +24,10 @@ public class User {
 
     private String phone;
 
-    private String address;
+    @Column(nullable = false) // role can't be null
+    private String role;
 
-    private String locality;
+    // Member functions
 
     // Constructors
     
@@ -34,14 +35,13 @@ public class User {
     public User(){} 
 
     // Parameterized constructor
-    public User(String name, String email, String password, String phone, String address, String locality) {
+    public User(String name, String email, String password, String phone, String role) {
         // not setting the userId because value of user_id will be set by DB - Autoincrement
         this.name = name;
         this.email = email;
         this.password = password;
         this.phone = phone;
-        this.address = address;
-        this.locality = locality;
+        this.role = role;
     }
 
     
@@ -79,28 +79,20 @@ public class User {
         this.password = password;
     }
 
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
     public String getPhone() {
         return phone;
     }
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getLocality() {
-        return locality;
-    }
-
-    public void setLocality(String locality) {
-        this.locality = locality;
     }
 
     @Override
@@ -111,8 +103,7 @@ public class User {
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", phone='" + phone + '\'' +
-                ", address='" + address + '\'' +
-                ", locality='" + locality + '\'' +
+                ", role='" + role + '\'' +
                 '}';
     }
 

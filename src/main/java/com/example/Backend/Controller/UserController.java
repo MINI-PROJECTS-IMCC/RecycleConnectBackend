@@ -4,12 +4,13 @@ import org.springframework.stereotype.Controller; // to use @Controller
 import org.springframework.web.bind.annotation.*; // tp use @RequestMapping,@PostMapping ,e.t.c
 import org.springframework.web.servlet.ModelAndView;
 import com.example.Backend.Services.UserServices;
-
 import com.example.Backend.Repositories.UserRepo; // to use 'UserRepo' repository
+import com.example.Backend.DTO.ApiResponse; // to use the class 'ApiResponse'
+import com.example.Backend.DTO.EmailPassword;
 import com.example.Backend.Entities.User; // to use class 'User'
 
 @CrossOrigin(origins = "*")
-@Controller
+@RestController
 @RequestMapping("/api")
 public class UserController {
 
@@ -25,15 +26,17 @@ public class UserController {
        return "getUser";
      }
 
-    @RequestMapping("/login")
+    @PostMapping("/login") // @PostMapping is used to specify that the method is used to process the data which is being send
     @ResponseBody
-    public boolean login( String email,String password)
-     {
-       return(us.login(email, password));
+    public ApiResponse login(@RequestBody EmailPassword ep){
+       System.out.println("In the login()");
+       System.out.println(ep.getEmail()+" "+ep.getPassword());
+       return(us.login(ep.getEmail(),ep.getPassword()));
      }
-    @RequestMapping("/createAccount")
+    
+    @PostMapping("/createAccount")
     @ResponseBody // Used to return the string not the view 
-    public boolean createAccount(/*String email,String password*/@RequestBody User user)
+    public ApiResponse createAccount(@RequestBody User user) // @RequestBody is used when json data is coming from frontend and we want to store it into object directly
      {
         return (us.createAccount(user));
      }
