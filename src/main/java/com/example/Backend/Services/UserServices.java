@@ -97,7 +97,7 @@ public class UserServices {
            } 
           else // If username doesn't exists already - then save this user into database
            { 
-             System.out.println(user.toString());
+             System.out.println(user); // toString() will get called automatcially here
              user.setPassword(encoder.encode(user.getPassword())); // encode the password and updtaed it in user object
              ref.save(user);
              msg = "Account created successfully";
