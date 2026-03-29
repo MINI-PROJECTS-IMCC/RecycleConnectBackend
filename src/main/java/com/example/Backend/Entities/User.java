@@ -23,7 +23,7 @@ public class User {
     private String password;
 
     private String phone;
-
+    
     @Column(nullable = false) // role can't be null
     private String role;
 
