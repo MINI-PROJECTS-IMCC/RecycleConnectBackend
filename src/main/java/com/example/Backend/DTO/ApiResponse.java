@@ -3,25 +3,32 @@ package com.example.Backend.DTO;
 public class ApiResponse {
 
     // Member variables
-    private String msg;
+    private String message;
+    private String token;
 
     // Member functions :-
 
     // 0 arg Constructor
     public ApiResponse() {
-        
+        token = null;
     }
     // Parameterized constructor
-    public ApiResponse(String msg) {
-        this.msg = msg;
+    public ApiResponse(String message,String token) {
+        this.message = message;
+        this.token = token;
     }
 
     // Getters and setters
-    public void setMessage(String msg) {
-        this.msg = msg;
+    public void setMessage(String message) {
+        this.message = message;
     }
     public String getMessage() {
-        return msg;
+        return message;
     }
-
+    public void setToken(String token) {
+        this.token = token;
+    }
+    public String getToken() {
+        return token;
+    }  
 }

@@ -26,8 +26,8 @@ public class SecurityConfig {
             .sessionManagement(session -> 
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // JWT
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/").permitAll()   // allow token API
-                .anyRequest().authenticated()       // secure others
+                .requestMatchers("/api/login", "/api/createAccount").permitAll()   // These endpoints doesn't need JWT 
+                .anyRequest().authenticated() // secure others
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // JwtFilter will execute before UsernamePasswordAuthenticationFilter
 

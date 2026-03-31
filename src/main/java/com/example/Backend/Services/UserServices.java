@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.Backend.DTO.ApiResponse; // to use class 'ApiResponse'
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; // to use class 'BCryptPasswordEncoder'
+import com.example.Backend.Util.JwtUtil;
 
 @Service 
 public class UserServices {
@@ -16,12 +17,9 @@ public class UserServices {
 
     BCryptPasswordEncoder encoder; // will be used to encode the password 
 
-    ApiResponse response;
-
     // 0 arg constructor
     public UserServices()
      {
-       response = new ApiResponse();
        encoder = new BCryptPasswordEncoder(); // default strength is 10 hence , I am not passing any argument , if you want any other strenght then you can pass it as an argument
      }
 
@@ -55,16 +53,18 @@ public class UserServices {
      }
     public ApiResponse login(String email,String password)
      {
+       ApiResponse response = new ApiResponse(); // response object which contains message and token(if login credentials are correct) 
        String msg = epValidation(email, password);
        // boolean result = false; // let's assume email address don't match or password is wrong 
-       if(epValidation(email, password)=="valid email and password") // Valid email and password
+       if(msg.equals("valid email and password")) // Valid email and password
        {
          System.out.println("Valid email and password");
          User temp = ref.findByEmail(email); // will point to the database user matching with received email id from the frontend
   
          if(temp!=null && encoder.matches(password,temp.getPassword())) // Registered email and password match
           {
-            msg = "Login successfull";
+            response.setToken(JwtUtil.generateToken(email)); // get the new token and add it into response object of type 'ApiResponse'
+            msg = "Login successful";
             //result = true;
           }
          else if(temp!=null && !encoder.matches(password,temp.getPassword())) // Registered email but wrong password
@@ -85,10 +85,11 @@ public class UserServices {
      }
     public ApiResponse createAccount(User user)
      {
+       ApiResponse response = new ApiResponse(); // response object which contains message and token(if login credentials are correct) 
        System.out.println(user.toString());
        // boolean result = false;
        String msg = epValidation(user.getEmail(), user.getPassword());
-       if(msg=="valid email and password") // Valid email and password
+       if(msg.equals("valid email and password")) // Valid email and password
        {
           if (ref.findByEmail(user.getEmail())!=null) // If username already used
            {

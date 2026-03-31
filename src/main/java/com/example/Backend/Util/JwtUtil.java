@@ -14,9 +14,9 @@ public class JwtUtil {
     private static final Key KEY = Keys.hmacShaKeyFor(SECRET.getBytes());
 
     // Generates a token 
-    public static String generateToken() {
+    public static String generateToken(String username) {
         return Jwts.builder()
-                .setSubject("testUser") // Username 
+                .setSubject(username) // Username 
                 .setIssuedAt(new Date()) // creates current date and time according to the system
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60)) // Expire after
                 .signWith(KEY) // stamp
