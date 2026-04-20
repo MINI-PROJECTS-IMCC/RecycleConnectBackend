@@ -8,6 +8,8 @@ import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Date;
 
+import com.example.Backend.Services.UserServices;
+
 public class JwtUtil {
 
     private static final String SECRET = "mysecretkeymysecretkeymysecretkey"; // min 32 chars
@@ -18,7 +20,7 @@ public class JwtUtil {
         return Jwts.builder()
                 .setSubject(username) // Username 
                 .setIssuedAt(new Date()) // creates current date and time according to the system
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60)) // Expire after
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60*60)) // Expire after 1 hour
                 .signWith(KEY) // stamp
                 .compact();
     }
@@ -30,4 +32,8 @@ public class JwtUtil {
             .parseClaimsJws(token)
             .getBody();
     }
+    // First remove the "Bearer " part from JWT and then we can use getSubject() on the remaining string
+    public static String extractUsername(String token) {
+    return validateToken(token).getSubject();
+}
 }

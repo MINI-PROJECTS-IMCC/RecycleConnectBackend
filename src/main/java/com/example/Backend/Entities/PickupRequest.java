@@ -38,6 +38,13 @@ public class PickupRequest {
         this.status = status;
     }
 
+    // toString() 
+    @Override
+    public String toString() {
+        return "PickupRequest [requestId=" + requestId + ", user=" + user + ", recycler=" + recycler + ", requestDate="
+                + requestDate + ", status=" + status + "]";
+    }
+
     // Getters and Setters
     public Long getRequestId() { return requestId; }
     public void setRequestId(Long requestId) { this.requestId = requestId; }
