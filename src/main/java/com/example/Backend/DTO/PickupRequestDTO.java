@@ -1,22 +1,21 @@
 
 package com.example.Backend.DTO;
-import com.example.Backend.Entities.User;
 import java.util.List;
 
 
 // First store data in pickup_request table then in item table
-public class RequestDTO {
+public class PickupRequestDTO {
 
     // User user; //  I need to fetch user from jwt token 
     String recyclerEmail; 
     List<ItemDTO> items;
 
     // Constructor
-    public RequestDTO() {
+    public PickupRequestDTO() {
         
     }
 
-    public RequestDTO(/*User user, */String recyclerEmail, List<ItemDTO> items) {
+    public PickupRequestDTO(/*User user, */String recyclerEmail, List<ItemDTO> items) {
        // this.user = user;
         this.recyclerEmail = recyclerEmail;
         this.items = items;

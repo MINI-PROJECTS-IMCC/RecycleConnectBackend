@@ -3,7 +3,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "recycler")
-public class Recycler {
+public class Recycler extends AbstractUser{
 
     // Member variables 
 
@@ -32,13 +32,14 @@ public class Recycler {
     public Recycler() {}
 
     // Parameterized constructor
-    public Recycler(String name, String email, String password, String phone, String serviceArea) {
+    public Recycler(String name, String email, String password, String phone/* , String serviceArea*/) {
         // not setting the recyclerId because value of recycler_id will be set by DB - Autoincrement
         this.name = name;
         this.email = email;
         this.password = password;
         this.phone = phone;
-        this.serviceArea = serviceArea;
+        
+        // this.serviceArea = serviceArea;
     }
 
     // Getters and Setters
@@ -47,10 +48,12 @@ public class Recycler {
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-
+    
+    @Override
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
+    @Override
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 

@@ -10,11 +10,11 @@ import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.example.Backend.DTO.ApiResponse; // to use class 'ApiResponse'
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; // to use class 'BCryptPasswordEncoder'
 import com.example.Backend.Util.JwtUtil;
-import com.example.Backend.DTO.RequestDTO;
-import com.example.Backend.DTO.ItemDTO;
+// to use class 'ApiResponse'
+import com.example.Backend.DTO.*; // to use classes 'RequestDTO', 'ItemDTO', 'RegistrationDTO', e.t.c
+
 
 
 
@@ -69,7 +69,7 @@ public class UserServices {
        System.out.println("epValidation() returns "+msg);
        return (msg);
      }
-    public ApiResponse login(String email,String password)
+    public ApiResponse login(String email,String password,String role)
      {
        ApiResponse response = new ApiResponse(); // response object which contains message and token(if login credentials are correct) 
        String msg = epValidation(email, password);
@@ -77,8 +77,11 @@ public class UserServices {
        if(msg.equals("valid email and password")) // Valid email and password
        {
          System.out.println("Valid email and password");
-         User temp = ur.findByEmail(email); // will point to the database user matching with received email id from the frontend
-  
+         AbstractUser temp = null;
+         if(role.equals("normalUser"))
+          temp  = ur.findByEmail(email); // will point to the matching record of the table 'user' with same email
+         else 
+          temp = rr.findByEmail(email); // will point to the matching record of the table 'recycler' with same email
          if(temp!=null && encoder.matches(password,temp.getPassword())) // Registered email and password match
           {
             response.setToken(JwtUtil.generateToken(email)); // get the new token and add it into response object of type 'ApiResponse'
@@ -101,24 +104,34 @@ public class UserServices {
       return response;
       // return msg;
      }
-    public ApiResponse createAccount(User user)
+    public ApiResponse createAccount(RegistrationDTO regDTO)
      {
        ApiResponse response = new ApiResponse(); // response object which contains message and token(if login credentials are correct) 
-       System.out.println(user.toString());
+       System.out.println(regDTO.toString());
        // boolean result = false;
-       String msg = epValidation(user.getEmail(), user.getPassword());
+       String msg = epValidation(regDTO.getEmail(), regDTO.getPassword());
        if(msg.equals("valid email and password")) // Valid email and password
        {
-          if (ur.findByEmail(user.getEmail())!=null) // If username already used
+          if (ur.findByEmail(regDTO.getEmail())!=null) // If username already used
            {
               msg = "Username already exists";
               //result = false;
            } 
           else // If username doesn't exists already - then save this user into database
            { 
-             System.out.println(user); // toString() will get called automatcially here
-             user.setPassword(encoder.encode(user.getPassword())); // encode the password and updtaed it in user object
-             ur.save(user);
+             System.out.println(regDTO); // toString() will get called automatcially here
+             regDTO.setPassword(encoder.encode(regDTO.getPassword())); // encode the password and updtaed it in user object
+             
+             if(regDTO.getRole().equals("normalUser"))
+              {
+                User user = new User(regDTO.getName(),regDTO.getEmail(),regDTO.getPassword(),regDTO.getPhone());
+                ur.save(user);
+              }
+             else 
+             {
+               Recycler recycler = new Recycler(regDTO.getName(),regDTO.getEmail(),regDTO.getPassword(),regDTO.getPhone());
+               rr.save(recycler);
+             }
              msg = "Account created successfully";
              //result = true;
            }
@@ -128,7 +141,7 @@ public class UserServices {
        // return (msg); - use if returning string
 
      } // method ends here
-    public void saveRequest(RequestDTO reqDTO, String pureJWT)
+    public void saveRequest(PickupRequestDTO reqDTO, String pureJWT)
      {
        String username = JwtUtil.extractUsername(pureJWT); // Take username from pure JWT - in our case username is email 
        User ref_User = ur.findByEmail(username); // returns teh User object from database
@@ -153,5 +166,17 @@ public class UserServices {
           obj.setQuantity(i.getQuantity());
           ir.save(obj);
         }
+     }
+    public AbstractUser profileData(String role,String pureJWT)
+     {
+       String username = JwtUtil.extractUsername(pureJWT); // Take username from pure JWT - in our case username is email
+       System.out.println("Username : "+username);
+       System.out.println("Role : "+role);
+       AbstractUser temp = null;
+       if(role.equals("normalUser")) // in case or normal user
+        temp = ur.findByEmail(username);
+       else // in case of recycler
+        temp = rr.findByEmail(username);
+       return temp;
      }
 } // class ends here

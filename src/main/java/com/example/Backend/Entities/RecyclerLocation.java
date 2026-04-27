@@ -19,16 +19,20 @@ public class RecyclerLocation {
     @Column(name = "service_area")
     private String serviceArea;
 
+    @Column(name = "service_area")
+    private String city;
+
     // Member functions
 
     // 0 arg constructor
     public RecyclerLocation() {}
 
     // parameterized constructor
-    public RecyclerLocation(Long locationId, User user, String serviceArea) {
+    public RecyclerLocation(Long locationId, User user, String serviceArea, String city) {
         this.locationId = locationId;
         this.user = user;
         this.serviceArea = serviceArea;
+        this.city = city;
     }
 
     // Getters and setters
@@ -54,7 +58,15 @@ public class RecyclerLocation {
 
     public void setServiceArea(String serviceArea) {
         this.serviceArea = serviceArea;
-    }    
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }      
 }
 
 
